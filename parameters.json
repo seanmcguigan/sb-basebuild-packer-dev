@@ -1,0 +1,13 @@
+{
+	"owners": "504936308768,420766097577,070143078640,668747147725,001998945603",
+	"vpc": "vpc-49a4852e",
+	"subnet": "subnet-489dcd2f",
+	"costcentre": "PD6135",
+	"email": "paul.adam@sainsburys.co.uk",
+	"environment": "nonprod",
+	"live": "no",
+	"owner": "Paul Adam",
+	"project": "foundation-network-bank",
+	"description": "",
+	"technicalcontact": ""
+}

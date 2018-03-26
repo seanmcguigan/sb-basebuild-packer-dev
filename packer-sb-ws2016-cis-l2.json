@@ -1,0 +1,98 @@
+{
+  "variables": {
+  	"aws_access_key": "",
+  	"aws_secret_key": "",
+    "vpc": "",
+    "subnet": "",
+    "aws_region": "",
+    "ami_name": "SB-WS2016-BB-V{{env `BUILD_NUMBER`}}",
+    "owners": "",
+    "source-ami": ""
+  },
+  "builders": [{
+  	"name": "AWS AMI Builder - CIS",
+  	"type": "amazon-ebs",
+
+  	"region": "{{user `aws_region`}}",
+  	"access_key": "{{user `aws_access_key`}}",
+  	"secret_key": "{{user `aws_secret_key`}}",
+
+    "source_ami_filter": {
+        "filters": {
+            "virtualization-type": "hvm",
+            "name": "CIS Microsoft Windows Server 2016 Benchmark 1.0.0 Level 2*",
+            "root-device-type": "ebs"
+        },
+        "owners": ["679593333241"],
+        "most_recent": true
+    },
+    "instance_type": "m3.medium",
+    "ssh_username": "ec2-user",
+    "ami_name": "{{user `ami_name` | clean_ami_name}}",
+    "ami_users": "{{user `owners`}}",
+
+    "tags": {
+      "Name": "{{user `ami_name`}}",
+      "costcentre": "PD6135",
+      "email": "david.mcnabb@sainsburys.co.uk",
+      "environment": "nonprod",
+      "live": "no",
+      "owner": "David McNabb",
+      "project": "foundation-network-bank"
+    },
+    "run_tags": {
+      "Name": "{{user `ami_name`}}",
+      "costcentre": "PD6135",
+      "email": "david.mcnabb@sainsburys.co.uk",
+      "environment": "nonprod",
+      "live": "no",
+      "owner": "David McNabb",
+      "project": "foundation-network-bank"
+    },
+    "run_volume_tags": {
+      "Name": "{{user `ami_name`}}",
+      "costcentre": "PD6135",
+      "email": "david.mcnabb@sainsburys.co.uk",
+      "environment": "nonprod",
+      "live": "no",
+      "owner": "David McNabb",
+      "project": "foundation-network-bank"
+    },
+    "snapshot_tags": {
+      "Name": "{{user `ami_name`}}",
+      "costcentre": "PD6135",
+      "email": "david.mcnabb@sainsburys.co.uk",
+      "environment": "nonprod",
+      "live": "no",
+      "owner": "David McNabb",
+      "project": "foundation-network-bank"
+    },
+    "ami_description": "CIS L2 Windows Server 2016 Benchmark for Sainsburys Bank",
+    "associate_public_ip_address": "true",
+    "ssh_private_ip": "false"
+  }],
+  "provisioners": [
+    {
+        "type": "shell",
+        "script": "./shell/bootstrap.ps1"
+    },
+    {
+        "type": "ansible-local",
+        "playbook_file": "ansible/playbook-ws2016.yml",
+        "role_paths": [
+            "ansible/roles/common-ws2016",
+            "ansible/roles/trendmicro-agent",
+            "ansible/roles/es-beats",
+            "ansible/roles/temp-rdp-access"
+        ],
+        "playbook_dir": "ansible",
+        "galaxy_file": "ansible/requirements-ws2016.yml"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "..."
+      ]
+    }
+  ]
+}

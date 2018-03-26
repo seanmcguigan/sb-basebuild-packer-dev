@@ -1,0 +1,111 @@
+{
+  "variables": {
+    "aws_access_key": "",
+    "aws_secret_key": "",
+    "vpc": "",
+    "subnet": "",
+    "aws_region": "",
+    "ami_name": "SB-RH7-BB-V{{env `BUILD_NUMBER`}}",
+    "owners": "",
+    "source-ami": ""
+  },
+  "builders": [{
+    "access_key": "{{user `aws_access_key`}}",
+    "ami_description": "CIS Red Hat Enterprise Linux 7 Benchmark for Sainsburys Bank",
+    "ami_name": "{{user `ami_name` | clean_ami_name}}",
+    "ami_users": "{{user `owners`}}",
+    "associate_public_ip_address": "true",
+    "iam_instance_profile": "basebuild-packer-edw-nonprod",
+    "instance_type": "m3.xlarge",
+    "name": "AWS AMI Builder - CIS",
+    "region": "{{user `aws_region`}}",
+    "secret_key": "{{user `aws_secret_key`}}",
+    "ssh_username": "ec2-user",
+    "token": "{{user `aws_session_token`}}",
+    "type": "amazon-ebs",
+
+    "source_ami_filter": {
+        "filters": {
+            "virtualization-type": "hvm",
+            "name": "CIS Red Hat Enterprise Linux 7 Benchmark v2.1.1.1 - Level 1-1b60cacb-a6b8-4a58-b152-212ee502fc91-ami-f7d8f48d.4",
+            "root-device-type": "ebs"
+        },
+        "owners": ["679593333241"]
+    },
+    "tags": {
+      "Name": "{{user `ami_name`}}",
+      "costcentre": "{{user `costcentre`}}",
+      "email": "{{user `email`}}",
+      "environment": "{{user `environment`}}",
+      "live": "{{user `live`}}",
+      "owner": "{{user `owner`}}",
+      "project": "{{user `project`}}",
+      "desc": "{{user `description`}}",
+      "technicalcontact": "{{user `technicaldate`}}"
+    },
+    "run_tags": {
+      "Name": "{{user `ami_name`}}",
+      "costcentre": "{{user `costcentre`}}",
+      "email": "{{user `email`}}",
+      "environment": "{{user `environment`}}",
+      "live": "{{user `live`}}",
+      "owner": "{{user `owner`}}",
+      "project": "{{user `project`}}",
+      "desc": "{{user `description`}}",
+      "technicalcontact": "{{user `technicaldate`}}"
+    },
+    "run_volume_tags": {
+      "Name": "{{user `ami_name`}}",
+      "costcentre": "{{user `costcentre`}}",
+      "email": "{{user `email`}}",
+      "environment": "{{user `environment`}}",
+      "live": "{{user `live`}}",
+      "owner": "{{user `owner`}}",
+      "project": "{{user `project`}}",
+      "desc": "{{user `description`}}",
+      "technicalcontact": "{{user `technicaldate`}}"
+    },
+    "snapshot_tags": {
+      "Name": "{{user `ami_name`}}",
+      "costcentre": "{{user `costcentre`}}",
+      "email": "{{user `email`}}",
+      "environment": "{{user `environment`}}",
+      "live": "{{user `live`}}",
+      "owner": "{{user `owner`}}",
+      "project": "{{user `project`}}",
+      "desc": "{{user `description`}}",
+      "technicalcontact": "{{user `technicaldate`}}"
+    }
+  }],
+  "provisioners": [
+    {
+        "type": "shell",
+        "script": "./shell/bootstrap.sh"
+    },
+    {
+        "type": "ansible-local",
+        "playbook_file": "ansible/playbook-rh7.yml",
+        "role_paths": [
+            "ansible/roles/common-rh7",
+            "ansible/roles/es-beats",
+            "ansible/roles/node-monitoring",
+            "ansible/roles/temp-ssh-access",
+            "ansible/roles/tenable-rh7",
+            "ansible/roles/trendmicro-agent"
+        ],
+        "playbook_dir": "ansible",
+        "galaxy_file": "ansible/requirements-rh7.yml"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo rm -f /root/.ssh/authorized_keys",
+        "sudo sed -i '/packer/d' /home/ec2-user/.ssh/authorized_keys",
+        "sudo rm -f /etc/tenable_tag",
+        "sudo find /tmp -group ec2-user -delete",
+        "sudo find /tmp -name *.rpm -delete",
+        "sudo rm -rf /var/tmp/aws-mon"
+      ]
+    }
+  ]
+}
